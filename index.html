@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Basic Broadcast Technology: A CTE Pathway Course | Technical Framing</title>
+  <title>Basic Broadcast Technology: A CTE Pathway Course | Lesson</title>
   <style>
 :root {
   --primary: #15803d;
@@ -162,6 +162,8 @@ body {
   font-weight: bold;
   border-radius: 6px;
   cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
 }
 .ctrl-btn:disabled { background: #94a3b8; }
 
@@ -177,17 +179,88 @@ body {
   align-items: center;
 }
 
+/* FORM STYLES */
 .form-group {
-  margin-bottom: 22px;
-  padding-bottom: 18px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
   border-bottom: 1px solid #e2e8f0;
 }
-label { font-weight: bold; margin-bottom: 6px; display: block; }
-input, textarea, select {
+
+.question-label {
+  font-weight: 700;
+  font-size: 0.98em;
+  margin-bottom: 10px;
+  display: block;
+  color: var(--text-dark);
+  line-height: 1.4;
+}
+
+input[type="text"], textarea, select {
   width: 100%;
-  padding: 10px;
+  padding: 11px 13px;
   border: 1px solid var(--border);
   border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.95em;
+  box-sizing: border-box;
+  background-color: #ffffff;
+}
+
+input[type="text"]:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.15);
+}
+
+.options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.option-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: normal;
+  cursor: pointer;
+  background: #f8fafc;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  font-size: 0.92em;
+}
+
+.option-label:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.option-label input[type="radio"],
+.option-label input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+  cursor: pointer;
+  accent-color: var(--primary);
+}
+
+.student-meta-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  background: var(--primary-light);
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  border: 1px solid #bbf7d0;
+}
+
+.student-meta-fields label {
+  font-weight: bold;
+  font-size: 0.85em;
+  color: var(--primary-dark);
 }
 
 .submit-btn {
@@ -200,6 +273,11 @@ input, textarea, select {
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.submit-btn:hover {
+  background: var(--primary-dark);
 }
 
 .tab-content { display: none; }
@@ -209,6 +287,15 @@ input, textarea, select {
 .italic { font-style: italic; }
 .subtitle { color: var(--text-muted); }
 
+@media print {
+  body { padding: 0; background: white; }
+  .header-card, .nav-tabs, .deck-controls, .print-hide { display: none !important; }
+  .card { box-shadow: none; border: none; padding: 0; }
+  .tab-content { display: block !important; }
+  #deck-tab, #res-tab { display: none !important; }
+  .form-group { page-break-inside: avoid; }
+  .submit-btn { display: none; }
+}
 </style>
 </head>
 <body>
@@ -257,7 +344,7 @@ input, textarea, select {
     </div>
 
     <div id="slide-stage" class="slide-stage">
-      <!-- Slides injected by script.js -->
+      <!-- Slides injected by script -->
     </div>
 
     <div class="deck-controls">
@@ -269,18 +356,20 @@ input, textarea, select {
   <!-- TAB: RESOURCE HUB -->
   <div id="res-tab" class="card tab-content">
     <h3>Lesson Resource & Reference Hub</h3>
-    <p class="muted">Access official course references below.</p>
+    <p class="muted">Access official course references and downloadable technical matrices below.</p>
     <div id="resource-list">
-      <!-- Resources injected by script.js -->
+      <!-- Resources injected by script -->
     </div>
   </div>
 
   <!-- TAB: STUDENT WORK CHECKPOINT -->
   <div id="form-tab" class="card tab-content">
-    <h3>Student Work Checkpoint & Reflection</h3>
+    <h3>Student Work Checkpoint & Assessment</h3>
+    <p class="muted">Complete all items below to demonstrate mastery of framing rules and Daktronics multi-zone design.</p>
+    
     <form id="checkpoint-form" onsubmit="event.preventDefault(); window.print();">
-      <!-- Dynamic form fields injected by script.js -->
-      <button type="submit" class="submit-btn">Print this page and turn into the Red Basket!</button>
+      <!-- Dynamic form fields injected by script -->
+      <button type="submit" class="submit-btn">Print Completed Worksheet for Submission</button>
     </form>
   </div>
 
@@ -291,18 +380,16 @@ let currentSlide = 1;
 let totalSlides = 1;
 let bellringers = [];
 
-// Stock image pool for default visual slides
 const stockImagePool = [
-  'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=300&q=80', // Turtle / Nature
-  'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=300&q=80', // Water / Earth-Diver
-  'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=300&q=80', // Ecology / Forest
-  'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=300&q=80', // Campfire / Orality
-  'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=300&q=80', // Literature / History
-  'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=300&q=80'  // Writing Workshop
+  'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=300&q=80',
+  'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=300&q=80',
+  'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=300&q=80',
+  'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=300&q=80',
+  'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=300&q=80',
+  'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=300&q=80'
 ];
 
-// Emoji fallback pool
-const iconPool = ['🐢', '🌊', '🌱', '🗣️', '☯️', '📝'];
+const iconPool = ['🎥', '📐', '🔍', '📺', '📊', '⚙️'];
 
 function renderSlides(slides) {
   const stage = document.getElementById('slide-stage');
@@ -313,9 +400,7 @@ function renderSlides(slides) {
     wrapper.className = 'slide' + (index === 0 ? ' active' : '');
     wrapper.id = `slide-${index + 1}`;
 
-    // Priority 1: slide.image OR Stock Web Image
     const imageUrl = slide.image || stockImagePool[index % stockImagePool.length];
-    // Fallback: slide.icon OR Emoji Pool
     const fallbackEmoji = slide.icon || iconPool[index % iconPool.length];
 
     const visualMediaHTML = `
@@ -347,6 +432,7 @@ function renderSlides(slides) {
     stage.appendChild(wrapper);
   });
 }
+
 function initLesson(data) {
   bellringers = data.bellringers || [];
   totalSlides = (data.slides || []).length || 1;
@@ -409,14 +495,11 @@ function renderResources(resources) {
 
     if (typeof res === 'string') {
       const cleanText = res.trim();
-      const isFile = /\.(pdf|docx?|pptx?|xlsx?)$/i.test(cleanText);
-      if (!isFile) return;
-
       const label = cleanText.split('/').pop();
       card.innerHTML = `
         <div>
           <strong>${label}</strong><br/>
-          <small>Repository file</small>
+          <small>Course Resource Document</small>
         </div>
         <a href="${cleanText}" target="_blank" rel="noopener noreferrer" class="ctrl-btn">Open Resource</a>
       `;
@@ -426,12 +509,11 @@ function renderResources(resources) {
 
     const resourceUrl = res.file || res.link || res.url || res.href || '#';
     const resourceTitle = res.title || res.name || res.label || 'Resource Item';
-    const resourceDescription = res.description || res.summary || '';
-    const fileName = resourceUrl && typeof resourceUrl === 'string' ? resourceUrl.split('/').pop() : '';
+    const resourceDescription = res.description || res.summary || 'Downloadable PDF / Technical Reference';
 
     card.innerHTML = `
       <div>
-        <strong>${resourceTitle || fileName || 'Resource Item'}</strong><br/>
+        <strong>${resourceTitle}</strong><br/>
         <small>${resourceDescription}</small>
       </div>
       ${resourceUrl && resourceUrl !== '#' ? `<a href="${resourceUrl}" target="_blank" rel="noopener noreferrer" class="ctrl-btn">Open Resource</a>` : ''}
@@ -442,43 +524,90 @@ function renderResources(resources) {
 
 function renderForm(fields) {
   const form = document.getElementById('checkpoint-form');
-  const submitBtn = form.querySelector('.submit-btn');
   form.innerHTML = '';
 
-  const fieldList = Array.isArray(fields) ? fields : [];
+  // Student Header Block
+  const metaBlock = document.createElement('div');
+  metaBlock.className = 'student-meta-fields';
+  metaBlock.innerHTML = `
+    <div>
+      <label for="student_name">Student Full Name:</label>
+      <input type="text" id="student_name" placeholder="First & Last Name" required />
+    </div>
+    <div>
+      <label for="student_date">Date:</label>
+      <input type="text" id="student_date" placeholder="MM/DD/YYYY" />
+    </div>
+    <div>
+      <label for="student_period">Class Period:</label>
+      <input type="text" id="student_period" placeholder="e.g. Period 2" />
+    </div>
+  `;
+  form.appendChild(metaBlock);
 
-  fieldList.forEach(field => {
+  let fieldList = [];
+
+  // Flexibly parse object keys or array input
+  if (Array.isArray(fields)) {
+    fieldList = fields;
+  } else if (fields && typeof fields === 'object') {
+    fieldList = Object.keys(fields).map((key, idx) => ({
+      field_id: key,
+      label: `${idx + 1}. ${fields[key]}`,
+      type: 'long_text'
+    }));
+  }
+
+  fieldList.forEach((field, i) => {
     const group = document.createElement('div');
     group.className = 'form-group';
 
-    const label = field.label || field.prompt || `Question ${field.field_id || ''}`.trim() || 'Question';
-    const id = `field_${(field.field_id || label).toString().replace(/\s+/g, '_').toLowerCase()}`;
+    const labelText = field.label || field.prompt || `Question ${i + 1}`;
+    const id = `field_${(field.field_id || 'q' + (i + 1)).toString().toLowerCase()}`;
+    const fieldType = field.type || 'short_answer';
 
     let inputHTML = '';
-    if (field.type === 'short_answer' || field.type === 'short_text' || field.type === 'text') {
-      inputHTML = `<input type="text" id="${id}" ${field.required ? 'required' : ''} />`;
-    } else if (field.type === 'date') {
-      inputHTML = `<input type="date" id="${id}" ${field.required ? 'required' : ''} />`;
-    } else if (field.type === 'long_text' || field.type === 'quote_citation' || field.type === 'reflection') {
-      inputHTML = `<textarea id="${id}" rows="5" ${field.required ? 'required' : ''}></textarea>`;
-    } else if (field.type === 'multiple_choice' || field.type === 'true_false') {
-      const options = field.type === 'true_false' ? ['True', 'False'] : (field.options || []);
-      inputHTML = options.map((option, index) => `<label><input type="radio" id="${id}_${index}" name="${id}" value="${option}" ${field.required ? 'required' : ''} /> ${option}</label>`).join('<br/>');
-    } else if (field.type === 'checkbox') {
-      inputHTML = (field.options || []).map((option, index) => `<label><input type="checkbox" id="${id}_${index}" name="${id}" value="${option}" /> ${option}</label>`).join('<br/>');
-    } else if (field.type === 'rating_scale') {
-      inputHTML = `<select id="${id}">${(field.options || []).map(o => `<option>${o}</option>`).join('')}</select>`;
-    } else if (field.type === 'select_rubric') {
-      inputHTML = `<select id="${id}"><option>-- Select Rubric Benchmark Level --</option>${(field.options || []).map(o => `<option>${o}</option>`).join('')}</select>`;
-    } else if (field.type === 'checkbox_group' || field.type === 'multi_select') {
-      inputHTML = (field.options || []).map(o => `<label><input type="checkbox" name="${id}" value="${o}" /> ${o}</label>`).join('<br/>');
+
+    if (fieldType === 'short_answer' || fieldType === 'text') {
+      inputHTML = `<input type="text" id="${id}" name="${id}" placeholder="Type your response here..." ${field.required ? 'required' : ''} />`;
+    } else if (fieldType === 'long_text' || fieldType === 'reflection' || fieldType === 'textarea') {
+      inputHTML = `<textarea id="${id}" name="${id}" rows="4" placeholder="Write your detailed technical explanation here..." ${field.required ? 'required' : ''}></textarea>`;
+    } else if (fieldType === 'multiple_choice' || fieldType === 'radio' || fieldType === 'true_false') {
+      const opts = fieldType === 'true_false' ? ['True', 'False'] : (field.options || []);
+      inputHTML = `<div class="options-container">` + 
+        opts.map((opt) => `
+          <label class="option-label">
+            <input type="radio" name="${id}" value="${opt}" ${field.required ? 'required' : ''}>
+            <span>${opt}</span>
+          </label>
+        `).join('') + `</div>`;
+    } else if (fieldType === 'checkbox' || fieldType === 'checkbox_group' || fieldType === 'multi_select') {
+      const opts = field.options || [];
+      inputHTML = `<div class="options-container">` + 
+        opts.map((opt) => `
+          <label class="option-label">
+            <input type="checkbox" name="${id}" value="${opt}">
+            <span>${opt}</span>
+          </label>
+        `).join('') + `</div>`;
+    } else if (fieldType === 'select' || fieldType === 'dropdown') {
+      const opts = field.options || [];
+      inputHTML = `
+        <select id="${id}" name="${id}" ${field.required ? 'required' : ''}>
+          <option value="" disabled selected>-- Select the correct choice --</option>
+          ${opts.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+        </select>`;
     }
 
-    group.innerHTML = `<label for="${id}">${label}</label>${inputHTML}`;
+    group.innerHTML = `<label class="question-label" for="${id}">${labelText}</label>${inputHTML}`;
     form.appendChild(group);
   });
 
-  if (submitBtn) form.appendChild(submitBtn);
+  const submitBtn = document.createElement('button');
+  submitBtn.type = 'submit';
+  submitBtn.className = 'submit-btn';
+  submitBtn.innerText = 'Print / Save Completed Work Checkpoint';
+  form.appendChild(submitBtn);
 }
 
 function switchTab(key) {
@@ -496,7 +625,230 @@ function switchTab(key) {
     document.getElementById('form-tab').classList.add('active');
   }
 }
-window.addEventListener('DOMContentLoaded', () => initLesson({"course_title": "Basic Broadcast Technology: A CTE Pathway Course", "unit": "Unit 4 - Camera Operations & Framing", "day": 15, "week": 4, "weekly_focus": "Composition; rule of thirds; depth of field; Daktronics visual layouts (CTE-CTB MN State Standards: CTB.03.01 & CTB.03.02).", "bellringers": ["How does adjusting aperture (f-stop) alter the depth of field in a studio camera setup?", "Where should a news anchor's eyes be positioned according to the Rule of Thirds grid?", "What is the operational purpose of a multi-zone layout on a Daktronics video board?", "Define 'headroom' and 'noseroom' in sports broadcast framing."], "slides": [{"title": "Learning Targets: Framing & Multi-Zone Composition", "standard": "CTE-CTB Standard CTB.03.01", "bullets": ["Master camera aperture and focal length settings to control depth of field.", "Apply the Rule of Thirds to position broadcast talent and graphics dynamically.", "Design balanced multi-zone display layouts for Daktronics control software."], "callout": "Industry Standard: Professional framing guides viewer attention instantly."}, {"title": "Rule of Thirds in Broadcast Composition", "standard": "CTE-CTB Standard CTB.03.01", "bullets": ["Divide the 16:9 frame into a 3x3 grid using horizontal and vertical guide lines.", "Position talent eyes along the upper horizontal third line for natural framing.", "Utilize vertical intersection points to anchor key visual elements and graphics."], "callout": "Composition Rule: Avoid placing talent dead-center unless intentional."}, {"title": "Managing Headroom, Noseroom, & Lead Space", "standard": "CTE-CTB Standard CTB.03.01", "bullets": ["Calibrate headroom to prevent excess dead space above a subject's head.", "Provide adequate noseroom in profile shots to give the talent visual direction.", "Incorporate lead space when panning or tracking moving athletes in sports coverage."], "callout": "Technical Precision: Improper headroom makes broadcasts look amateurish."}, {"title": "Depth of Field: Controlling Aperture & Focal Length", "standard": "CTE-CTB Standard CTB.03.01", "bullets": ["Select wide apertures (e.g., f/2.8) to create shallow depth of field and soft backgrounds.", "Utilize telephoto focal lengths to compress distance and isolate news anchors.", "Calculate focal plane distances to ensure crisp subject focus during live studio broadcasts."], "callout": "Optics Mastery: Shallow depth of field separates subject from background noise."}, {"title": "Daktronics Visual Layout Architecture", "standard": "CTE-CTB Standard CTB.03.02", "bullets": ["Explore multi-zone canvas architecture in Daktronics Show Control systems.", "Divide display displays into dedicated live video, score, and ticker zones.", "Ensure aspect ratio consistency across custom LED screen resolutions."], "callout": "System Integration: Multi-zone layouts deliver real-time data efficiently."}, {"title": "Spatial Balance in Multi-Zone Displays", "standard": "CTE-CTB Standard CTB.03.02", "bullets": ["Establish visual hierarchy by allocating primary display real estate to live video.", "Position static scoreboards and sponsor graphic zones along lower or side borders.", "Prevent visual clutter by maintaining clean borders and consistent color contrast."], "callout": "Layout Principle: Live video remains the dominant focal point."}, {"title": "Integrating Camera Shots with Graphic Overlays", "standard": "CTE-CTB Standard CTB.03.01", "bullets": ["Frame talent off-center to allow clear screen space for lower-third graphics.", "Coordinate camera angles with automated Daktronics stat overlay positions.", "Maintain shot consistency across multi-camera switches during live broadcasts."], "callout": "Technical Coordination: Camera operators must frame for graphics."}, {"title": "Color Contrast & Readability on LED Boards", "standard": "CTE-CTB Standard CTB.03.02", "bullets": ["Select high-contrast typography and background pairings for outdoor LED displays.", "Avoid dark text on dark video backgrounds within lower-third ticker zones.", "Test graphic scaling across different display pixel pitches and viewing distances."], "callout": "Readability First: High contrast ensures graphics remain legible from stands."}, {"title": "Camera Operation: ISO, Shutter, & Focus Control", "standard": "CTE-CTB Standard CTB.03.01", "bullets": ["Set shutter speeds to double the frame rate (1/120s for 60fps) for smooth motion.", "Balance ISO settings to minimize sensor noise in indoor gymnasium setups.", "Utilize peaking and focus assist tools to maintain critical focus on talent."], "callout": "Exposure Triangle: Balance light gathered without sacrificing depth of field."}, {"title": "Real-World Field Application: Live Sports Setup", "standard": "CTE-CTB Standard CTB.03.02", "bullets": ["Configure Camera 1 (Main Play-by-Play) with deep depth of field to keep action sharp.", "Configure Camera 2 (Sideline/Hero) with shallow depth of field for emotional close-ups.", "Map video feed routing directly into Daktronics Show Control input zones."], "callout": "Production Workflow: Match camera roles to multi-zone board positions."}, {"title": "Troubleshooting Visual Clutter & Framing Errors", "standard": "CTE-CTB Standard CTB.03.01", "bullets": ["Identify common errors: cut-off heads, awkward background mergers, and tilt bias.", "Correct zone overlap issues where graphics obstruct live camera talent.", "Perform live line-checks prior to going live on the stadium board."], "callout": "Quality Assurance: Always check graphic overlays over live camera feeds."}, {"title": "Day 15 Studio Lab & Technical Checklist", "standard": "CTE-CTB Standard CTB.03.01", "bullets": ["Execute framing challenge: capture 3 shot types adhering to Rule of Thirds.", "Build a 3-zone Daktronics display layout incorporating live video and score data.", "Submit technical framing matrix and screen captures for peer review."], "callout": "Practical Assessment: Demonstrate accurate framing and layout design."}], "resources": {"title": "Technical Framing & Daktronics Multi-Zone Design Guide", "description": "A CTE lab manual and technical checklist covering aperture control, Rule of Thirds camera positioning, and multi-zone layout design for Daktronics display boards.", "materials_needed": ["Studio Broadcast Cameras with Tripods", "Daktronics Show Control / Display Layout Software Workstation", "Framing & Depth of Field Calibration Targets"], "station_setup": ["Station 1: Shallow Depth of Field & Aperture Calibration Lab", "Station 2: Rule of Thirds & Anchor Framing Station", "Station 3: Daktronics Multi-Zone Layout Design Console"], "buttons": [{"label": "Download Camera & Layout Technical Matrix PDF", "file": "Broadcast_Framing_Daktronics_Layout_Matrix.pdf"}]}, "form": {"q1": "How does opening the aperture to a lower f-stop (e.g., f/2.8) impact the background depth of field?", "q2": "Explain where a camera operator should align a news anchor's eyes using the Rule of Thirds.", "q3": "What framing adjustment is required if a broadcast anchor has zero headroom in the shot?", "q4": "Why is 'noseroom' necessary when framing a subject seated in profile during an interview?", "q5": "List the three standard zones typically configured on a high school sports Daktronics video board.", "q6": "According to CTE standard CTB.03.02, why must live video remain the primary zone in a multi-zone layout?", "q7": "How does framing a shot off-center accommodate lower-third graphic overlays in a news production?", "q8": "What operational problem occurs if text graphics lack sufficient color contrast against live video?", "q9": "Describe the function of manual focus peaking when acquiring focus on a distant sideline athlete.", "q10": "Summarize the step-by-step process of balancing aperture, focal length, and camera-to-subject distance to isolate a presenter from a busy background."}}));
+
+window.addEventListener('DOMContentLoaded', () => initLesson({
+  "course_title": "Basic Broadcast Technology: A CTE Pathway Course",
+  "unit": "Unit 4 - Camera Operations & Framing",
+  "day": 15,
+  "week": 4,
+  "weekly_focus": "Composition; rule of thirds; depth of field; Daktronics visual layouts (CTE-CTB MN State Standards: CTB.03.01 & CTB.03.02).",
+  "bellringers": [
+    "How does adjusting aperture (f-stop) alter the depth of field in a studio camera setup?",
+    "Where should a news anchor's eyes be positioned according to the Rule of Thirds grid?",
+    "What is the operational purpose of a multi-zone layout on a Daktronics video board?",
+    "Define 'headroom' and 'noseroom' in sports broadcast framing."
+  ],
+  "slides": [
+    {
+      "title": "Learning Targets: Framing & Multi-Zone Composition",
+      "standard": "CTE-CTB Standard CTB.03.01",
+      "bullets": [
+        "Master camera aperture and focal length settings to control depth of field.",
+        "Apply the Rule of Thirds to position broadcast talent and graphics dynamically.",
+        "Design balanced multi-zone display layouts for Daktronics control software."
+      ],
+      "callout": "Industry Standard: Professional framing guides viewer attention instantly."
+    },
+    {
+      "title": "Rule of Thirds in Broadcast Composition",
+      "standard": "CTE-CTB Standard CTB.03.01",
+      "bullets": [
+        "Divide the 16:9 frame into a 3x3 grid using horizontal and vertical guide lines.",
+        "Position talent eyes along the upper horizontal third line for natural framing.",
+        "Utilize vertical intersection points to anchor key visual elements and graphics."
+      ],
+      "callout": "Composition Rule: Avoid placing talent dead-center unless intentional."
+    },
+    {
+      "title": "Managing Headroom, Noseroom, & Lead Space",
+      "standard": "CTE-CTB Standard CTB.03.01",
+      "bullets": [
+        "Calibrate headroom to prevent excess dead space above a subject's head.",
+        "Provide adequate noseroom in profile shots to give the talent visual direction.",
+        "Incorporate lead space when panning or tracking moving athletes in sports coverage."
+      ],
+      "callout": "Technical Precision: Improper headroom makes broadcasts look amateurish."
+    },
+    {
+      "title": "Depth of Field: Controlling Aperture & Focal Length",
+      "standard": "CTE-CTB Standard CTB.03.01",
+      "bullets": [
+        "Select wide apertures (e.g., f/2.8) to create shallow depth of field and soft backgrounds.",
+        "Utilize telephoto focal lengths to compress distance and isolate news anchors.",
+        "Calculate focal plane distances to ensure crisp subject focus during live studio broadcasts."
+      ],
+      "callout": "Optics Mastery: Shallow depth of field separates subject from background noise."
+    },
+    {
+      "title": "Daktronics Visual Layout Architecture",
+      "standard": "CTE-CTB Standard CTB.03.02",
+      "bullets": [
+        "Explore multi-zone canvas architecture in Daktronics Show Control systems.",
+        "Divide display displays into dedicated live video, score, and ticker zones.",
+        "Ensure aspect ratio consistency across custom LED screen resolutions."
+      ],
+      "callout": "System Integration: Multi-zone layouts deliver real-time data efficiently."
+    },
+    {
+      "title": "Spatial Balance in Multi-Zone Displays",
+      "standard": "CTE-CTB Standard CTB.03.02",
+      "bullets": [
+        "Establish visual hierarchy by allocating primary display real estate to live video.",
+        "Position static scoreboards and sponsor graphic zones along lower or side borders.",
+        "Prevent visual clutter by maintaining clean borders and consistent color contrast."
+      ],
+      "callout": "Layout Principle: Live video remains the dominant focal point."
+    },
+    {
+      "title": "Integrating Camera Shots with Graphic Overlays",
+      "standard": "CTE-CTB Standard CTB.03.01",
+      "bullets": [
+        "Frame talent off-center to allow clear screen space for lower-third graphics.",
+        "Coordinate camera angles with automated Daktronics stat overlay positions.",
+        "Maintain shot consistency across multi-camera switches during live broadcasts."
+      ],
+      "callout": "Technical Coordination: Camera operators must frame for graphics."
+    },
+    {
+      "title": "Color Contrast & Readability on LED Boards",
+      "standard": "CTE-CTB Standard CTB.03.02",
+      "bullets": [
+        "Select high-contrast typography and background pairings for outdoor LED displays.",
+        "Avoid dark text on dark video backgrounds within lower-third ticker zones.",
+        "Test graphic scaling across different display pixel pitches and viewing distances."
+      ],
+      "callout": "Readability First: High contrast ensures graphics remain legible from stands."
+    },
+    {
+      "title": "Camera Operation: ISO, Shutter, & Focus Control",
+      "standard": "CTE-CTB Standard CTB.03.01",
+      "bullets": [
+        "Set shutter speeds to double the frame rate (1/120s for 60fps) for smooth motion.",
+        "Balance ISO settings to minimize sensor noise in indoor gymnasium setups.",
+        "Utilize peaking and focus assist tools to maintain critical focus on talent."
+      ],
+      "callout": "Exposure Triangle: Balance light gathered without sacrificing depth of field."
+    },
+    {
+      "title": "Real-World Field Application: Live Sports Setup",
+      "standard": "CTE-CTB Standard CTB.03.02",
+      "bullets": [
+        "Configure Camera 1 (Main Play-by-Play) with deep depth of field to keep action sharp.",
+        "Configure Camera 2 (Sideline/Hero) with shallow depth of field for emotional close-ups.",
+        "Map video feed routing directly into Daktronics Show Control input zones."
+      ],
+      "callout": "Production Workflow: Match camera roles to multi-zone board positions."
+    },
+    {
+      "title": "Troubleshooting Visual Clutter & Framing Errors",
+      "standard": "CTE-CTB Standard CTB.03.01",
+      "bullets": [
+        "Identify common errors: cut-off heads, awkward background mergers, and tilt bias.",
+        "Correct zone overlap issues where graphics obstruct live camera talent.",
+        "Perform live line-checks prior to going live on the stadium board."
+      ],
+      "callout": "Quality Assurance: Always check graphic overlays over live camera feeds."
+    },
+    {
+      "title": "Day 15 Studio Lab & Technical Checklist",
+      "standard": "CTE-CTB Standard CTB.03.01",
+      "bullets": [
+        "Execute framing challenge: capture 3 shot types adhering to Rule of Thirds.",
+        "Build a 3-zone Daktronics display layout incorporating live video and score data.",
+        "Submit technical framing matrix and screen captures for peer review."
+      ],
+      "callout": "Practical Assessment: Demonstrate accurate framing and layout design."
+    }
+  ],
+  "resources": {
+    "title": "Technical Framing & Daktronics Multi-Zone Design Guide",
+    "description": "A CTE lab manual and technical checklist covering aperture control, Rule of Thirds camera positioning, and multi-zone layout design for Daktronics display boards.",
+    "buttons": [
+      {
+        "label": "Download Camera & Layout Technical Matrix PDF",
+        "file": "Broadcast_Framing_Daktronics_Layout_Matrix.pdf"
+      }
+    ]
+  },
+  "form": [
+    {
+      "field_id": "q1",
+      "label": "1. How does opening the aperture to a lower f-stop (e.g., f/2.8) impact the background depth of field?",
+      "type": "multiple_choice",
+      "options": [
+        "It creates a shallow depth of field, blurring background distractions",
+        "It creates a deep depth of field, keeping everything in sharp focus",
+        "It increases digital sensor noise without affecting optical focus",
+        "It shrinks the field of view angle"
+      ],
+      "required": true
+    },
+    {
+      "field_id": "q2",
+      "label": "2. According to the Rule of Thirds grid, where should a camera operator align a seated news anchor's eyes?",
+      "type": "multiple_choice",
+      "options": [
+        "Along the top horizontal third line",
+        "Dead center in the exact middle of the frame",
+        "Along the bottom third line near lower-third graphics",
+        "At the extreme left edge of the screen"
+      ],
+      "required": true
+    },
+    {
+      "field_id": "q3",
+      "label": "3. What framing adjustment is required if a broadcast anchor has zero headroom in the shot?",
+      "type": "short_answer",
+      "required": true
+    },
+    {
+      "field_id": "q4",
+      "label": "4. Which section should occupy the primary (largest) display zone on a Daktronics stadium video board?",
+      "type": "select",
+      "options": [
+        "Live Camera Video Feed (Zone 1)",
+        "Out-of-Town Score Ticker (Zone 2)",
+        "Sponsor Banner Ads (Zone 3)",
+        "Static School Logo"
+      ],
+      "required": true
+    },
+    {
+      "field_id": "q5",
+      "label": "5. Select ALL key considerations when framing talent for lower-third graphic overlays (Select all that apply):",
+      "type": "checkbox_group",
+      "options": [
+        "Reserve the bottom 20-25% of the camera frame for titles",
+        "Position key visual anchors or eye-lines on off-center intersections",
+        "Ensure high color contrast between graphic text and live video",
+        "Cut off talent heads at the top of the frame to make room"
+      ]
+    },
+    {
+      "field_id": "q6",
+      "label": "6. Why is 'noseroom' (lead space) necessary when framing an interview subject seated in profile?",
+      "type": "short_answer",
+      "required": true
+    },
+    {
+      "field_id": "q7",
+      "label": "7. When shooting 60fps sports action, what shutter speed locks motion without strobing on stadium LED screens?",
+      "type": "multiple_choice",
+      "options": [
+        "1/120s (Double the frame rate rule)",
+        "1/30s (Half the frame rate)",
+        "1/60s (Matching frame rate)",
+        "1/1000s (Maximum shutter)"
+      ]
+    },
+    {
+      "field_id": "q8",
+      "label": "8. Step-by-Step Synthesis: Summarize how to balance aperture, focal length, and subject distance to cleanly isolate an anchor from a noisy crowd background.",
+      "type": "long_text",
+      "required": true
+    }
+  ]
+}));
 </script>
 </body>
 </html>
